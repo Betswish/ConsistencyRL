@@ -2,9 +2,12 @@
 
 <div align="center">
 
-Authors (_* Equal contribution_): [Tianyu Liu*](https://rycolab.io/authors/tianyu/) • [Jirui Qi*](https://betswish.github.io/) • [Raquel Fernández](https://staff.fnwi.uva.nl/r.fernandezrovira/) • [Mrinmaya Sachan](https://rycolab.io/authors/mrinmaya/) • [Arianna Bisazza](https://www.cs.rug.nl/~bisazza/) •  [Ryan Cotterell](https://rycolab.io/authors/ryan/)
+Authors (_* Equal contribution_):  
+[Tianyu Liu*](https://rycolab.io/authors/tianyu/) • [Jirui Qi*](https://betswish.github.io/) • [Raquel Fernández](https://staff.fnwi.uva.nl/r.fernandezrovira/)  
+[Mrinmaya Sachan](https://rycolab.io/authors/mrinmaya/) • [Arianna Bisazza](https://www.cs.rug.nl/~bisazza/) • [Ryan Cotterell](https://rycolab.io/authors/ryan/)
 
 </div>
+
 
 ## (0) Environment Setup
 ### Install Dependencies from environment.yml
