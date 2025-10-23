@@ -22,16 +22,10 @@ load_dotenv(dotenv_path='./.env')
 hf_token = os.environ.get("HF_TOKEN")
 login(token=hf_token)
 
+cache_dir = os.getenv("CACHE_DIR", "~/.cache")
+cache_dir = os.path.expanduser(cache_dir)
+
 api = HfApi()
-
-
-def success_repo(hub_model_id):
-    try:    
-        files = api.list_repo_files(repo_id=hub_model_id, repo_type="model")
-        if 'tokenizer.json' in files: return True
-        else: return False
-    except Exception as e:
-        return False
     
 def train_direction(
     seed: int = 0,
@@ -40,31 +34,15 @@ def train_direction(
     learning_rate: float = 1e-5,
     beta: float = 1.0,
     sft_baseline: bool = False,
-    constrained_logp: bool = False,
     num_train_epochs: int = 1,
     mname: str | None = None,
     languages: list[str] | None = None,
-    lang1_learning_strength: float | None = None,
-    lang2_learning_strength: float | None = None,
     use_false_examples: bool = False,
     precompute_ref_log_probs: bool = False,
     do_logging: bool = False,
 ) -> None:
-    
-    # Load the model and tokenizer
-    if "gemma" in mname.lower():
-        model = AutoModelForCausalLM.from_pretrained(
-            mname,
-            dtype=torch.bfloat16,
-            attn_implementation="eager",
-            device_map="auto"
-        )
-    else:
-        model = AutoModelForCausalLM.from_pretrained(
-            mname,
-            dtype=torch.bfloat16,
-            device_map="auto"
-        )
+
+    model = AutoModelForCausalLM.from_pretrained(mname, dtype=torch.bfloat16, device_map="auto")
     tokenizer = AutoTokenizer.from_pretrained(mname)
     # Ensure the tokenizer has a pad token
     if tokenizer.pad_token is None:
@@ -93,7 +71,6 @@ def train_direction(
     training_args = SPOConfig(
         learning_rate=learning_rate,
         beta=beta,
-        constrained_logp=constrained_logp,
         output_dir=f"/cluster/work/cotterell/tianyu/spo-align-ckpt/{hub_model_id}",
         bf16=True,
         precompute_ref_log_probs=precompute_ref_log_probs,
@@ -157,16 +134,13 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', type=str, default='bmlama', help='dataset name')
     parser.add_argument('--beta', type=float, default=1.0, help='beta value')
     parser.add_argument('--learning_rate', type=float, default=1e-5, help='learning rate')
-    parser.add_argument('--constrained_logp', action='store_true', help='whether to constrain logp')
     parser.add_argument('--instance_num', type=int, default=5000, help='number of instances')
     parser.add_argument('--mname', type=str, default='meta-llama/Llama-3.2-3B', help='model name')
     parser.add_argument('--languages', nargs='+', default=['en', 'fr'], help='languages')
-    parser.add_argument('--lang1_learning_strength', type=float, default=1.0, help='learning strength for language 1')
-    parser.add_argument('--lang2_learning_strength', type=float, default=1.0, help='learning strength for language 2')
+    parser.add_argument('--precompute_ref_log_probs', action='store_true', help='whether to precompute reference log probabilities')
     parser.add_argument('--use_false_examples', action='store_true', help='whether to use false examples')
     parser.add_argument('--do_logging', action='store_true', help='whether to do MLflow logging')
     parser.add_argument('--num_train_epochs', type=int, default=1, help='number of training epochs')
-    parser.add_argument('--precompute_ref_log_probs', action='store_true', help='whether to precompute reference log probabilities')
     parser.add_argument('--sft_baseline', action='store_true', help='whether to use SFT baseline')
 
     args = parser.parse_args()
@@ -175,28 +149,22 @@ if __name__ == "__main__":
     instance_num = args.instance_num
     mname = args.mname
     languages = args.languages
-    lang1_learning_strength = args.lang1_learning_strength
-    lang2_learning_strength = args.lang2_learning_strength
-    use_false_examples = args.use_false_examples
     precompute_ref_log_probs = args.precompute_ref_log_probs
     do_logging = args.do_logging
-    constrained_logp = args.constrained_logp
     num_train_epochs = args.num_train_epochs
+    use_false_examples = args.use_false_examples
     sft_baseline = args.sft_baseline
 
     train_direction(
         seed=seed,
         beta=args.beta,
         learning_rate=args.learning_rate,
-        constrained_logp=constrained_logp,
         sft_baseline=sft_baseline,
         num_train_epochs=num_train_epochs,
         dataset=dataset,
         instance_num=instance_num,
         mname=mname,
         languages=languages,
-        lang1_learning_strength=lang1_learning_strength,
-        lang2_learning_strength=lang2_learning_strength,
         use_false_examples=use_false_examples,
         precompute_ref_log_probs=precompute_ref_log_probs,
         do_logging=do_logging
