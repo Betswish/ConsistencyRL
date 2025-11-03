@@ -69,6 +69,7 @@ def predict_mask(model, answer_cand, prompt, mname):
 def probe(
     seed: int = 0,
     dataset: str | None = None,
+    beta: float = 1.0,
     train_instance_num: int = 5000,
     instance_num: int = 5000,
     mname: str | None = None,
@@ -77,7 +78,7 @@ def probe(
     
     train_data = f"seed{seed}_sample{instance_num}_{dataset}"
 
-    post_mname = f"{mname.replace('/', '-')}_{'-'.join(languages)}_1.0-1.0_1.0"
+    post_mname = f"{mname.replace('/', '-')}_{'-'.join(languages)}_1.0-1.0_{beta}"
 
     try:
         mapping_modelid = json.load(open(f'mapping_modelid_{dataset}.json'))
@@ -207,6 +208,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--seed', type=int, default=0, help='random seed for data generation')
     parser.add_argument('--dataset', type=str, default='bmlama', help='dataset name')
+    parser.add_argument('--beta', type=float, default=1.0, help='beta value')
     parser.add_argument('--train_instance_num', type=int, default=5000, help='number of training instances')
     parser.add_argument('--instance_num', type=int, default=5000, help='number of instances')
     parser.add_argument('--mname', type=str, default='meta-llama/Llama-3.2-3B', help='model name')
@@ -215,12 +217,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     seed = args.seed
     dataset = args.dataset
+    beta = args.beta
     train_instance_num = args.train_instance_num
     instance_num = args.instance_num
     mname = args.mname
     languages = args.languages
 
     probe(
-        seed=seed, dataset=dataset, train_instance_num=train_instance_num,
+        seed=seed, dataset=dataset, beta=beta, train_instance_num=train_instance_num,
         instance_num=instance_num, mname=mname, languages=languages
     )
