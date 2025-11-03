@@ -89,10 +89,6 @@ def probe(
         hub_model_id = f"{mapping_modelid[modelid]}/{modelid}"
     else:
         return
-        # hub_model_id = f"/cluster/work/cotterell/tianyu/spo-align-ckpt/{modelid}/"
-        # if not os.path.exists(hub_model_id):
-        #     print(f"No valid model found: {hub_model_id}")
-        #     return
 
     print("Testing", hub_model_id)
     print(f"Number of GPU: {torch.cuda.device_count()}")
@@ -113,14 +109,11 @@ def probe(
     extra_kw = {"download_dir": cache_dir}
     model = VLLM(
         model=hub_model_id,
-        # tokenizer=mname,
         tensor_parallel_size=torch.cuda.device_count(),
         gpu_memory_utilization=0.80,
         dtype=torch.bfloat16,
         distributed_executor_backend="mp",
         trust_remote_code=True,
-        # max_model_len=5600,
-        # max_num_batched_tokens=5600,
         max_num_seqs=100,
         seed=2024,
         disable_custom_all_reduce=True,

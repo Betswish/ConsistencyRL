@@ -81,7 +81,6 @@ def probe_baseline(
         dtype=torch.bfloat16,
         distributed_executor_backend="mp",
         trust_remote_code=True,
-        # max_model_len=8192,
         max_num_seqs=100,
         seed=2024,
         disable_custom_all_reduce=True,
