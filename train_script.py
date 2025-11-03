@@ -56,12 +56,12 @@ def train_direction(
     if not use_false_examples:
         # Load the training dataset
         train_dataset = Dataset.from_list(json.load(open(f"data/seed{seed}_sample{instance_num}_{dataset}/{'-'.join(languages)}.json")))
-        hub_model_id = f"seed{seed}_sample{instance_num}_{dataset}_{mname.replace('/', '-')}_{'-'.join(languages)}_{lang1_learning_strength}-{lang2_learning_strength}_{beta}"
+        hub_model_id = f"seed{seed}_sample{instance_num}_{dataset}_{mname.replace('/', '-')}_{'-'.join(languages)}_1.0-1.0_{beta}"
     else:
         # Load the training dataset with false examples
         train_dataset = Dataset.from_list(json.load(open(f"data/seed{seed}_sample{instance_num}_{dataset}_false/{'-'.join(languages)}.json")))
-        hub_model_id = f"seed{seed}_sample{instance_num}_{dataset}_false_{mname.replace('/', '-')}_{'-'.join(languages)}_{lang1_learning_strength}-{lang2_learning_strength}_{beta}"
-    
+        hub_model_id = f"seed{seed}_sample{instance_num}_{dataset}_false_{mname.replace('/', '-')}_{'-'.join(languages)}_1.0-1.0_{beta}"
+
     if dataset == 'bmlama':
         per_device_train_batch_size = 4
         gradient_accumulation_steps = 1
