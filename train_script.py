@@ -4,7 +4,7 @@ from huggingface_hub.utils import disable_progress_bars
 import json
 import os, subprocess
 import torch
-from trl.trainer import SPOConfig, SPOTrainer
+from trl.trainer import DCOConfig, DCOTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import argparse
 from huggingface_hub import login, HfApi
@@ -83,7 +83,7 @@ def train_direction(
     else:
         raise ValueError(f"Unsupported dataset: {dataset}")
     
-    training_args = SPOConfig(
+    training_args = DCOConfig(
         learning_rate=learning_rate,
         beta=beta,
         output_dir=f"checkpoints/{hub_model_id}",
@@ -109,7 +109,7 @@ def train_direction(
     else:
         ref_model = AutoModelForCausalLM.from_pretrained(mname, dtype=torch.bfloat16, device_map="auto", cache_dir=cache_dir)
 
-    trainer = SPOTrainer(
+    trainer = DCOTrainer(
         model=model,
         ref_model=ref_model,
         args=training_args, processing_class=tokenizer, train_dataset=train_dataset)

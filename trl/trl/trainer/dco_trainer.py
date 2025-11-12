@@ -48,7 +48,7 @@ from transformers.utils import is_peft_available, is_torch_xpu_available
 from ..data_utils import maybe_apply_chat_template, maybe_extract_prompt
 from ..models import PreTrainedModelWrapper, create_reference_model
 from .callbacks import SyncRefModelCallback
-from .spo_config import SPOConfig, FDivergenceConstants, FDivergenceType
+from .dco_config import DCOConfig, FDivergenceConstants, FDivergenceType
 from .utils import (
     RunningMoments,
     cap_exp,
@@ -162,9 +162,9 @@ class DataCollatorForPreference(DataCollatorMixin):
         return output
 
 
-class SPOTrainer(Trainer):
+class DCOTrainer(Trainer):
     r"""
-    Initialize SPOTrainer.
+    Initialize DCOTrainer.
 
     Args:
         model (`transformers.PreTrainedModel`):
@@ -172,8 +172,8 @@ class SPOTrainer(Trainer):
         ref_model (`PreTrainedModelWrapper`):
             Hugging Face transformer model with a casual language modelling head. Used for implicit reward computation and loss. If no
             reference model is provided, the trainer will create a reference model with the same architecture as the model to be optimized.
-        args (`SPOConfig`):
-            The SPO config arguments to use for training.
+        args (`DCOConfig`):
+            The DCO config arguments to use for training.
         data_collator (`transformers.DataCollator`):
             The data collator to use for training. If None is specified, the default data collator (`DataCollatorForPreference`) will be used
             which will pad the sequences to the maximum length of the sequences in the batch, given a dataset of paired sequences.
@@ -207,7 +207,7 @@ class SPOTrainer(Trainer):
         self,
         model: Optional[Union[PreTrainedModel, nn.Module, str]] = None,
         ref_model: Optional[Union[PreTrainedModel, nn.Module, str]] = None,
-        args: Optional[SPOConfig] = None,
+        args: Optional[DCOConfig] = None,
         data_collator: Optional[DataCollator] = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Union[Dataset, dict[str, Dataset]]] = None,
@@ -234,7 +234,7 @@ class SPOTrainer(Trainer):
             model_init_kwargs = {}
         elif not isinstance(model, str):
             raise ValueError(
-                "You passed model_init_kwargs to the SPOTrainer/SPOConfig, but your model is already instantiated."
+                "You passed model_init_kwargs to the DCOTrainer/DCOConfig, but your model is already instantiated."
             )
         else:
             model_init_kwargs = args.model_init_kwargs
@@ -245,7 +245,7 @@ class SPOTrainer(Trainer):
                     torch_dtype = getattr(torch, torch_dtype)
                 if torch_dtype != "auto" and not isinstance(torch_dtype, torch.dtype):
                     raise ValueError(
-                        f"Invalid `torch_dtype` passed to the SPOConfig. Expected a string with either `torch.dtype` or 'auto', but got {torch_dtype}."
+                        f"Invalid `torch_dtype` passed to the DCOConfig. Expected a string with either `torch.dtype` or 'auto', but got {torch_dtype}."
                     )
                 model_init_kwargs["torch_dtype"] = torch_dtype
 
@@ -253,7 +253,7 @@ class SPOTrainer(Trainer):
             ref_model_init_kwargs = {}
         elif not isinstance(ref_model, str):
             raise ValueError(
-                "You passed ref_model_init_kwargs to the SPOTrainer/SPOConfig, but your ref_model is already instantiated."
+                "You passed ref_model_init_kwargs to the DCOTrainer/DCOConfig, but your ref_model is already instantiated."
             )
         else:
             ref_model_init_kwargs = args.ref_model_init_kwargs
@@ -264,7 +264,7 @@ class SPOTrainer(Trainer):
                     torch_dtype = getattr(torch, torch_dtype)
                 if torch_dtype != "auto" and not isinstance(torch_dtype, torch.dtype):
                     raise ValueError(
-                        f"Invalid `torch_dtype` passed to the SPOConfig. Expected a string with either `torch.dtype` or 'auto', but got {torch_dtype}."
+                        f"Invalid `torch_dtype` passed to the DCOConfig. Expected a string with either `torch.dtype` or 'auto', but got {torch_dtype}."
                     )
                 ref_model_init_kwargs["torch_dtype"] = torch_dtype
 
@@ -291,8 +291,8 @@ class SPOTrainer(Trainer):
 
             if ref_model is not None and not args.force_use_ref_model:
                 raise ValueError(
-                    "You passed both a ref_model and a peft_config. For training PEFT adapters with SPO there is no need to pass a reference"
-                    " model. Please pass `ref_model=None` in case you want to train PEFT adapters, or pass a ref_model with `force_use_ref_model=True` in SPOTrainer's init."
+                    "You passed both a ref_model and a peft_config. For training PEFT adapters with DCO there is no need to pass a reference"
+                    " model. Please pass `ref_model=None` in case you want to train PEFT adapters, or pass a ref_model with `force_use_ref_model=True` in DCOTrainer's init."
                     " if you want to use a different ref_model."
                 )
 
@@ -363,7 +363,7 @@ class SPOTrainer(Trainer):
             self.ref_model = create_reference_model(model)
 
         if processing_class is None:
-            raise ValueError("processing_class must be specified to tokenize a SPO dataset.")
+            raise ValueError("processing_class must be specified to tokenize a DCO dataset.")
 
         if args.padding_value is not None:
             self.padding_value = args.padding_value
@@ -374,8 +374,8 @@ class SPOTrainer(Trainer):
                 self.padding_value = processing_class.tokenizer.pad_token_id
             else:
                 raise ValueError(
-                    "`padding_value` is not specified in `SPOConfig`, and `pad_token_id` is missing in the "
-                    "`processing_class`. Please either set the `padding_value` argument in `SPOConfig`, or set "
+                    "`padding_value` is not specified in `DCOConfig`, and `pad_token_id` is missing in the "
+                    "`processing_class`. Please either set the `padding_value` argument in `DCOConfig`, or set "
                     "`tokenizer.pad_token` (e.g., `tokenizer.pad_token = tokenizer.eos_token`) before instantiating "
                     "the trainer."
                 )
@@ -425,7 +425,7 @@ class SPOTrainer(Trainer):
                 UserWarning,
             )
         if args.loss_type == "kto_pair":
-            raise ValueError("Support for kto_pair has been removed in SPOTrainer. Please use KTOTrainer.")
+            raise ValueError("Support for kto_pair has been removed in DCOTrainer. Please use KTOTrainer.")
 
         self.sft_baseline = args.sft_baseline
         self.beta = args.beta
@@ -449,7 +449,7 @@ class SPOTrainer(Trainer):
         self.dataset_num_proc = args.dataset_num_proc
 
         # The trainer estimates the number of FLOPs (floating-point operations) using the number of elements in the
-        # input tensor associated with the key "input_ids". However, in SPO, the sampled data does not include the
+        # input tensor associated with the key "input_ids". However, in DCO, the sampled data does not include the
         # "input_ids" key. Instead, the available keys are "prompt_input_ids", "chosen_input_ids", and
         # "rejected_input_ids". As a result, the trainer issues the warning: "Could not estimate the number of tokens
         # of the input, floating-point operations will not be computed." To suppress this warning, we set the
@@ -509,7 +509,7 @@ class SPOTrainer(Trainer):
                 )
             if args.sync_ref_model:
                 raise ValueError(
-                    "You currently cannot use `ref_model=None` with TR-SPO method. Please provide `ref_model`."
+                    "You currently cannot use `ref_model=None` with TR-DCO method. Please provide `ref_model`."
                 )
         else:
             if self.is_deepspeed_enabled:
@@ -520,7 +520,7 @@ class SPOTrainer(Trainer):
         if args.sync_ref_model:
             if self.precompute_ref_log_probs:
                 raise ValueError(
-                    "You cannot use `precompute_ref_log_probs=True` with TR-SPO method. Please set `precompute_ref_log_probs=False`."
+                    "You cannot use `precompute_ref_log_probs=True` with TR-DCO method. Please set `precompute_ref_log_probs=False`."
                 )
 
             self.add_callback(SyncRefModelCallback(ref_model=self.ref_model, accelerator=self.accelerator))
@@ -532,7 +532,7 @@ class SPOTrainer(Trainer):
         self,
         dataset: Union[Dataset, IterableDataset],
         processing_class: Union[PreTrainedTokenizerBase, BaseImageProcessor, FeatureExtractionMixin, ProcessorMixin],
-        args: SPOConfig,
+        args: DCOConfig,
         dataset_name: str,
     ) -> Union[Dataset, IterableDataset]:
         # Build the kwargs for the `map` function
@@ -603,7 +603,7 @@ class SPOTrainer(Trainer):
         >>> features = {"prompt": "The sky is", "chosen": " blue", "rejected": " green", "prompt_id": 0, "chosen_id": 1, "rejected_id": 2, "class": 1},
         >>> # features = {"prompt": "Le ciel est", "chosen": " bleu", "rejected": " vert", "prompt_id": 0, "chosen_id": 1, "rejected_id": 2, "class": 2}
         >>> ...
-        >>> SPOTrainer.tokenize_row(
+        >>> DCOTrainer.tokenize_row(
         ...     features, tokenizer, max_prompt_length=3, max_completion_length=3, add_special_tokens=False
         ... )
         {'prompt_input_ids': [464, 6766, 318], 'chosen_input_ids': [4171, 50256], 'rejected_input_ids': [4077, 50256]}
@@ -677,7 +677,7 @@ class SPOTrainer(Trainer):
     def _set_signature_columns_if_needed(self):
         # If `self.args.remove_unused_columns` is True, non-signature columns are removed.
         # By default, this method sets `self._signature_columns` to the model's expected inputs.
-        # In SPOTrainer, we preprocess data, so using the model's signature columns doesn't work.
+        # In DCOTrainer, we preprocess data, so using the model's signature columns doesn't work.
         # Instead, we set them to the columns expected by `DataCollatorForPreference`, hence the override.
         if self._signature_columns is None:
             self._signature_columns = [
@@ -873,7 +873,7 @@ class SPOTrainer(Trainer):
 
         return output
 
-    def spo_loss(
+    def dco_loss(
         self,
         chosen_1_logps: torch.FloatTensor,
         rejected_1_logps: torch.FloatTensor,
@@ -885,7 +885,7 @@ class SPOTrainer(Trainer):
         ref_rejected_2_logps: Optional[torch.FloatTensor]=0.
     ):
         """
-        Compute the SPO loss for a batch of policy and reference model log probabilities.
+        Compute the DCO loss for a batch of policy and reference model log probabilities.
 
         Args:
             chosen_1_logps (`torch.FloatTensor`):
@@ -899,7 +899,7 @@ class SPOTrainer(Trainer):
 
         Returns:
             A tuple of three tensors: `(losses, chosen_rewards, rejected_rewards)`.
-            The losses tensor contains the SPO loss for each example in the batch.
+            The losses tensor contains the DCO loss for each example in the batch.
             The `chosen_rewards` and `rejected_rewards` tensors contain the rewards for the chosen and rejected
             responses, respectively.
         """
@@ -1124,7 +1124,7 @@ class SPOTrainer(Trainer):
         batch: dict[str, Union[list, torch.LongTensor]],
         train_eval: Literal["train", "eval"] = "train",
     ):
-        """Compute the SPO loss and other metrics for the given batch of inputs for train or test."""
+        """Compute the DCO loss and other metrics for the given batch of inputs for train or test."""
         metrics = {}
 
         model_output = self.concatenated_forward(model, batch)
@@ -1141,7 +1141,7 @@ class SPOTrainer(Trainer):
             else:
                 ref_chosen_1_logps, ref_rejected_1_logps, ref_chosen_2_logps, ref_rejected_2_logps = self.compute_ref_log_probs(batch)
 
-        losses = self.spo_loss(
+        losses = self.dco_loss(
             model_output["chosen_1_logps"],
             model_output["rejected_1_logps"],
             model_output["chosen_2_logps"],
@@ -1421,7 +1421,7 @@ class SPOTrainer(Trainer):
         #     tags=tags,
         #     wandb_url=wandb.run.get_url() if is_wandb_available() and wandb.run is not None else None,
         #     comet_url=get_comet_experiment_url(),
-        #     trainer_name="SPO",
+        #     trainer_name="DCO",
         #     trainer_citation=citation,
         #     paper_title="Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
         #     paper_id="2305.18290",

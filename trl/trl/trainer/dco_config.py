@@ -32,9 +32,9 @@ class FDivergenceConstants:
 
 
 @dataclass
-class SPOConfig(TrainingArguments):
+class DCOConfig(TrainingArguments):
     r"""
-    Configuration class for the [`SPOTrainer`].
+    Configuration class for the [`DCOTrainer`].
 
     Using [`~transformers.HfArgumentParser`] we can turn this class into
     [argparse](https://docs.python.org/3/library/argparse#module-argparse) arguments that can be specified on the
@@ -45,10 +45,10 @@ class SPOConfig(TrainingArguments):
 
         model_init_kwargs (`dict[str, Any]` or `None`, *optional*, defaults to `None`):
             Keyword arguments for `AutoModelForCausalLM.from_pretrained`, used when the `model` argument of the
-            [`SPOTrainer`] is provided as a string.
+            [`DCOTrainer`] is provided as a string.
         ref_model_init_kwargs (`dict[str, Any]` or `None`, *optional*, defaults to `None`):
             Keyword arguments for `AutoModelForCausalLM.from_pretrained`, used when the `ref_model` argument of the
-            [`SPOTrainer`] is provided as a string.
+            [`DCOTrainer`] is provided as a string.
         model_adapter_name (`str` or `None`, *optional*, defaults to `None`):
             Name of the train target PEFT adapter, when using LoRA with multiple adapters.
         ref_adapter_name (`str` or `None`, *optional*, defaults to `None`):
@@ -106,12 +106,12 @@ class SPOConfig(TrainingArguments):
         loss_type (`str`, *optional*, defaults to `"sigmoid"`):
             Type of loss to use. Possible values are:
 
-                - `"sigmoid"`: sigmoid loss from the original [SPO](https://huggingface.co/papers/2305.18290) paper.
+                - `"sigmoid"`: sigmoid loss from the original [DCO](https://huggingface.co/papers/2305.18290) paper.
                 - `"hinge"`: hinge loss on the normalized likelihood from the [SLiC](https://huggingface.co/papers/2305.10425) paper.
                 - `"ipo"`: IPO loss from the [IPO](https://huggingface.co/papers/2310.12036) paper.
                 - `"exo_pair"`: pairwise EXO loss from the [EXO](https://huggingface.co/papers/2402.00856) paper.
                 - `"nca_pair"`: pairwise NCA loss from the [NCA](https://huggingface.co/papers/2402.05369) paper.
-                - `"robust"`: unbiased estimate of the SPO loss that is robust to preference noise from the [Robust SPO](https://huggingface.co/papers/2403.00409) paper.
+                - `"robust"`: unbiased estimate of the DCO loss that is robust to preference noise from the [Robust DCO](https://huggingface.co/papers/2403.00409) paper.
                 - `"bco_pair"`: pairwise BCO loss from the [BCO](https://huggingface.co/papers/2404.04656) paper.
                 - `"sppo_hard"`: SPPO loss with hard label from the [SPPO](https://huggingface.co/papers/2405.00675) paper.
                 - `"aot"`: AOT loss for paired datasets from the [AOT](https://huggingface.co/papers/2406.05882) paper.
@@ -127,33 +127,33 @@ class SPOConfig(TrainingArguments):
         f_divergence_type (`str`, *optional*, defaults to `FDivergenceType.REVERSE_KL`):
             Type of f-divergence regularization function to compute divergence between policy and reference model.
         f_alpha_divergence_coef (`float`, *optional*, defaults to `1.0`):
-            α coefficient in the α-divergence u^-α regularization function for SPO loss.
+            α coefficient in the α-divergence u^-α regularization function for DCO loss.
         reference_free (`bool`, *optional*, defaults to `False`):
             Whether to ignore the provided reference model and implicitly use a reference model that assigns equal
             probability to all responses.
         label_smoothing (`float`, *optional*, defaults to `0.0`):
-            Robust SPO label smoothing parameter from the [cSPO](https://ericmitchell.ai/cdpo.pdf) report and
-            [Robust SPO](https://huggingface.co/papers/2403.00409) paper that should be between `0.0` and `0.5`.
+            Robust DCO label smoothing parameter from the [cDCO](https://ericmitchell.ai/cdpo.pdf) report and
+            [Robust DCO](https://huggingface.co/papers/2403.00409) paper that should be between `0.0` and `0.5`.
         use_weighting (`bool`, *optional*, defaults to `False`):
             Whether to weight the loss as done in the [WPO](https://huggingface.co/papers/2406.11827) paper.
         rpo_alpha (`float`, *optional*, defaults to `None`):
             α parameter from the [RPO](https://huggingface.co/papers/2404.19733) paper (v3), which controls the
             weighting of the NLL term in the loss. If `None`, no weighting is applied and the loss is the same as the
-            SPO loss. The paper recommends `rpo_alpha=1.0`.
+            DCO loss. The paper recommends `rpo_alpha=1.0`.
         discopop_tau (`float`, *optional*, defaults to `0.05`):
             τ/temperature parameter from the [DiscoPOP](https://huggingface.co/papers/2406.08414) paper, which controls
             the shape of log ratio modulated loss. The paper recommends the default value `discopop_tau=0.05`.
         sync_ref_model (`bool`, *optional*, defaults to `False`):
             Whether to synchronize the reference model with the active model every `ref_model_sync_steps` steps, using
             the `ref_model_mixup_alpha` parameter. This synchronization originites from the
-            [TR-SPO](https://huggingface.co/papers/2404.09656) paper.
+            [TR-DCO](https://huggingface.co/papers/2404.09656) paper.
         ref_model_mixup_alpha (`float`, *optional*, defaults to `0.6`):
-            α parameter from the [TR-SPO](https://huggingface.co/papers/2404.09656) paper, which controls the mix
+            α parameter from the [TR-DCO](https://huggingface.co/papers/2404.09656) paper, which controls the mix
             between the current policy and the previous reference policy during updates. The reference policy is
             updated according to the equation: `π_ref = α * π_θ + (1 - α) * π_ref_prev`. To use this parameter, you
             must set `sync_ref_model=True`.
         ref_model_sync_steps (`int`, *optional*, defaults to `512`):
-            τ parameter from the [TR-SPO](https://huggingface.co/papers/2404.09656) paper, which determines how
+            τ parameter from the [TR-DCO](https://huggingface.co/papers/2404.09656) paper, which determines how
             frequently the current policy is synchronized with the reference policy. To use this parameter, you must
             set `sync_ref_model=True`.
 
@@ -169,14 +169,14 @@ class SPOConfig(TrainingArguments):
         default=None,
         metadata={
             "help": "Keyword arguments for `AutoModelForCausalLM.from_pretrained`, used when the `model` argument of "
-            "the `SPOTrainer` is provided as a string."
+            "the `DCOTrainer` is provided as a string."
         },
     )
     ref_model_init_kwargs: Optional[dict[str, Any]] = field(
         default=None,
         metadata={
             "help": "Keyword arguments for `AutoModelForCausalLM.from_pretrained`, used when the `ref_model` argument "
-            "of the `SPOTrainer` is provided as a string."
+            "of the `DCOTrainer` is provided as a string."
         },
     )
     model_adapter_name: Optional[str] = field(
@@ -326,7 +326,7 @@ class SPOConfig(TrainingArguments):
     )
     f_alpha_divergence_coef: float = field(
         default=1.0,
-        metadata={"help": "α coefficient in the α-divergence u^-α regularization function for SPO loss."},
+        metadata={"help": "α coefficient in the α-divergence u^-α regularization function for DCO loss."},
     )
     reference_free: bool = field(
         default=False,
@@ -338,7 +338,7 @@ class SPOConfig(TrainingArguments):
     label_smoothing: float = field(
         default=0.0,
         metadata={
-            "help": "Robust SPO label smoothing parameter from the cSPO report and Robust SPO paper that should "
+            "help": "Robust DCO label smoothing parameter from the cDCO report and Robust DCO paper that should "
             "be between `0.0` and `0.5`."
         },
     )
@@ -350,7 +350,7 @@ class SPOConfig(TrainingArguments):
         default=None,
         metadata={
             "help": "α parameter from the RPO paper (v3), which controls the weighting of the NLL term in the loss. "
-            "If `None`, no weighting is applied and the loss is the same as the SPO loss. The paper recommends "
+            "If `None`, no weighting is applied and the loss is the same as the DCO loss. The paper recommends "
             "`rpo_alpha=1.0`."
         },
     )
@@ -371,7 +371,7 @@ class SPOConfig(TrainingArguments):
     ref_model_mixup_alpha: float = field(
         default=0.6,
         metadata={
-            "help": "α parameter from the TR-SPO paper, which controls the mix between the current policy and the "
+            "help": "α parameter from the TR-DCO paper, which controls the mix between the current policy and the "
             "previous reference policy during updates. The reference policy is updated according to the equation: "
             "`π_ref = α * π_θ + (1 - α) * π_ref_prev`. To use this parameter, you must set `sync_ref_model=True`."
         },
@@ -379,7 +379,7 @@ class SPOConfig(TrainingArguments):
     ref_model_sync_steps: int = field(
         default=512,
         metadata={
-            "help": "τ parameter from the TR-SPO paper, which determines how frequently the current policy is "
+            "help": "τ parameter from the TR-DCO paper, which determines how frequently the current policy is "
             "synchronized with the reference policy. To use this parameter, you must set `sync_ref_model=True`."
         },
     )
