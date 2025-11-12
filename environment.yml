@@ -8,7 +8,7 @@ dependencies:
   - python=3.11
   - pip:
       - huggingface-hub
-      - torch==2.7.0
+      - torch==2.7.1
       - scipy
       - tokenizers
       - tqdm
