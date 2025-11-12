@@ -5,6 +5,7 @@ import argparse
 import random
 import csv
 import shutil
+import datasets
 
 from tqdm import tqdm
 import torch
@@ -87,37 +88,31 @@ def probe_baseline(
         **extra_kw
     )
 
-
-    if dataset.lower() == "bmlama":
-        data_path = f"data/BMLAMA17"
-    elif dataset.lower() == "mmmlu":
-        data_path = f"data/MMMLU"
-    elif dataset.lower() == "xcsqa":
-        data_path = f"data/XCSQA"
+    raw_data = dict()
+    if "mmmlu" in dataset.lower():
+        data_name = "JRQi/MMMLU"
+        dname = "mmmlu"
+    elif "xcsqa" in dataset.lower():
+        data_name = "JRQi/XCSQA"
+        dname = "xcsqa"
+    elif "bmlama" in dataset.lower():
+        data_name = "JRQi/BMLAMA17"
+        dname = "bmlama"
     else:
-        raise ValueError(f"Unknown dataset: {dataset}")
+        raise ValueError(f"Unsupported dataset: {dataset}")
     
+    for lang in languages:
+        raw_data[lang] = datasets.load_dataset(data_name, lang, split="test").to_list()
+
+    random.seed(seed)
+    train_ids = random.sample(list(range(len(raw_data[languages[0]]))), train_instance_num)
+    test_ids = list(set(range(len(raw_data[languages[0]]))) - set(train_ids))
+
     for lang in languages:
         # Skip if the probing results already exist
         if os.path.exists(f'{save_path}/{lang}_Accuracy.json'): continue
-        raw_data = []
-        with open(f"{data_path}/{lang}.tsv") as f:
-            reader = csv.reader(f, delimiter="\t")
-            for row in reader:
-                if row[0] == "Prompt": continue
-                if len(row) <= 1: continue
-                else:
-                    row[1] = row[1].split(', ') if dataset == "bmlama" else [row[1]]
-                    row[2] = row[2].split(', ') if dataset == "bmlama" else eval(row[2])
-                    raw_data.append(row)
 
-        random.seed(seed)
-        # print(len(raw_data))
-
-        train_ids = random.sample(list(range(len(raw_data))), train_instance_num)
-        test_ids = list(set(range(len(raw_data))) - set(train_ids))
-        data = [raw_data[i] for i in test_ids]
-        
+        data = [raw_data[lang][i] for i in test_ids]
         accuracy = 0
 
         # For saving probing results
@@ -125,9 +120,9 @@ def probe_baseline(
         all_ranked_indices = []
 
         for i, d in enumerate(tqdm(data)):
-            prompt = d[0]
-            gold_ans_list = d[1]
-            answer_cand = d[2]
+            prompt = d['Prompt'].strip()
+            gold_ans_list = d['Ans']
+            answer_cand = d['Candidate Ans']
             
             answer_pred_probs = predict_mask(model, answer_cand, prompt, mname)
             # {'Naples': 5.40697877407074, 'Rome': 5.137976503372192, ..., 'Mecca': 5.60733792998574}

@@ -27,15 +27,21 @@ cd ..
 
 For instance, to generate 5,000 instances for English and French languages, run the following command:
 ```bash
-bash 1_prepare_data.sh
-```
-
-If you want to generate instances only with negative answers
-```bash
-bash 1_prepare_data_false.sh
+bash scripts/1_prepare_data_mmmlu.sh
+bash scripts/1_prepare_data_xcsqa.sh
+bash scripts/1_prepare_data_bmlama.sh
 ```
 
 ## (2) Train your model
+
+To train your model, firstly write your `hf_token` into `.env`. Then, run the following script to train your model. It will automatically upload the trained model onto Huggingface and also save a copy locally in `checkpoints/`.
+
+```bash
+bash scripts/2_train_mmmlu.sh
+bash scripts/2_train_xcsqa.sh
+bash scripts/2_train_bmlama.sh
+```
+
 
 ## (3) Test and evaluation
 
