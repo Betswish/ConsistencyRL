@@ -122,6 +122,8 @@ def train_direction(
     trainer.train()
     trainer.save_model()
 
+    if os.path.exists(f"checkpoints/{hub_model_id}"): shutil.rmtree(f"checkpoints/{hub_model_id}")
+
     print(f"Finished training {hub_model_id} on {languages} with beta {beta}")
     print('====')
     return

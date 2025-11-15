@@ -29,14 +29,12 @@ seeds=(
 )
 
 for SEED in "${seeds[@]}"; do
-	for pair in "${pairs[@]}"; do
-		for mname in "${models[@]}"; do
-			# for ((i=0; i<${#all_langs[@]}-1; i++))
-			for ((i=0; i<1; i++)); do
-				for ((j=i+1; j<${#all_langs[@]}; j++)); do
-					echo "Post-training " $mname " with RL on split: " ${all_langs[$i]} ${all_langs[$j]}
-					python train_direction.py --seed $SEED --dataset bmlama --instance_num 5000 --mname $mname --languages ${all_langs[$i]} ${all_langs[$j]}
-				done
+	for mname in "${models[@]}"; do
+		# for ((i=0; i<${#all_langs[@]}-1; i++))
+		for ((i=0; i<1; i++)); do
+			for ((j=i+1; j<${#all_langs[@]}; j++)); do
+				echo "Post-training " $mname " with RL on split: " ${all_langs[$i]} ${all_langs[$j]}
+				python train_script.py --seed $SEED --dataset bmlama --instance_num 5000 --mname $mname --languages ${all_langs[$i]} ${all_langs[$j]} --precompute_ref_log_probs --push_to_hub
 			done
 		done
 	done

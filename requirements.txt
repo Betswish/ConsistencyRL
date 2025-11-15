@@ -8,6 +8,7 @@ diffusers==0.35.1
 evaluate==0.4.6
 fastapi==0.118.2
 huggingface_hub==0.34.4
+hf_transfer==0.1.9
 Jinja2==3.1.6
 joblib==1.5.2
 latex2sympy2_extended==1.10.2
