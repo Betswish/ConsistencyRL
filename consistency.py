@@ -87,6 +87,7 @@ def compute_consis_baseline(
         except Exception as e:
             CLC_list.append(-100.00) # Append -100 for languages that fail to compute consistency
 
+    print(f"Baseline\t&\t" + '\t&\t'.join(map(str, CLC_list)) + r" \\")
     return CLC_list
 
 
@@ -106,10 +107,7 @@ def compute_consis(
         mname=mname,
         metric=metric
     )
-    if not use_false_examples:
-        train_data = f"seed{seed}_sample{instance_num}_{dataset}"
-    else:
-        train_data = f"seed{seed}_sample{instance_num}_{dataset}_false"
+    train_data = f"seed{seed}_sample{instance_num}_{dataset}"
 
     if dataset == 'bmlama':
         langs = ['fr', 'nl', 'es', 'ru', 'ja', 'zh', 'ko', 'vi', 'el', 'hu', 'he', 'tr', 'ca', 'ar', 'uk', 'fa']
@@ -145,7 +143,7 @@ def compute_consis(
         except Exception as e:
             CLC_list.append(-100.00) # Append -100 for languages that fail to compute consistency
 
-    print(f"+ \methodname" + " & " + " & ".join([f"{'+' if c > bc else ''}{c-bc:.2f}" if c != -100.00 else "Fail" for c, bc in zip(CLC_list, base_CLC_list)]) + r" \\")
+    print(f"+ \methodname" + "\t&\t" + "\t&\t".join([f"{'+' if c > bc else ''}{c-bc:.2f}" if c != -100.00 else "Fail" for c, bc in zip(CLC_list, base_CLC_list)]) + r" \\")
     return CLC_list
 
 if __name__ == "__main__":

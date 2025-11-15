@@ -43,7 +43,7 @@ def compute_acc_baseline(
         except Exception as e:
             acc_list.append(-100.00)  # Append -100 for languages that fail to compute consistency
 
-    # print(f"Baseline  ={[acc_en]+list(acc_list)}")
+    print(f"Baseline  ={[acc_en]+list(acc_list)}")
     return acc_list
 
 def compute_acc(
@@ -68,7 +68,6 @@ def compute_acc(
         langs = ['fr', 'nl', 'es', 'ru', 'ja', 'zh', 'ko', 'vi', 'el', 'hu', 'he', 'tr', 'ca', 'ar', 'uk', 'fa']
     elif dataset == 'mmmlu':
         langs = ['ar', 'de', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'pt', 'sw', 'yo', 'zh', 'bn']
-        langs = ['ar', 'de', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'pt', 'zh']
     elif dataset == 'xcsqa':
         langs = ['zh', 'de', 'es', 'fr', 'it', 'ja', 'nl', 'pl', 'pt', 'ru', 'ar', 'vi', 'hi', 'sw', 'ur']
     else:
