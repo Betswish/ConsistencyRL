@@ -28,7 +28,7 @@ def predict_mask(model, answer_cand, prompt, mname):
     prompt_batch = []
     for answer in answer_cand:
         answer_cand_probs = []
-        prompt_new = prompt.replace("<mask>", answer)
+        prompt_new = prompt + answer
         # Fix the issue that Bloom Tokenizer will not automatically add the BOS token
         if "bloom" in mname: prompt_new = "<s>" + prompt_new
         prompt_batch.append(prompt_new)
