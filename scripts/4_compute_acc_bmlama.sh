@@ -4,8 +4,6 @@
 # BMLAMA-17 supported languages:
 # en fr nl es ru ja zh ko vi el hu he tr ca ar uk fa
 
-all_langs=(en fr nl es ru ja zh ko vi el hu he tr ca ar uk fa)
-
 models=(
 	"Qwen/Qwen2.5-7B"
     "Qwen/Qwen2.5-14B"

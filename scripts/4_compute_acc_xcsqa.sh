@@ -4,8 +4,6 @@
 # XCSQA supported languages:
 # en zh de es fr it ja nl pl pt ru ar vi hi sw ur
 
-all_langs=(en zh de es fr it ja nl pl pt ru ar vi hi sw ur)
-
 models=(
 	"Qwen/Qwen2.5-7B"
     "Qwen/Qwen2.5-14B"

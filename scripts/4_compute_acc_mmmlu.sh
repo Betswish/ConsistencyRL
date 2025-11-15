@@ -4,8 +4,6 @@
 # MMMLU supported languages:
 # en ar bn de es fr hi id it ja ko pt sw yo zh
 
-all_langs=(en ar bn de es fr hi id it ja ko pt sw yo zh)
-
 models=(
 	"Qwen/Qwen2.5-7B"
     "Qwen/Qwen2.5-14B"
