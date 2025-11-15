@@ -145,8 +145,8 @@ def probe(
 
         for i, d in enumerate(tqdm(data)):
             prompt = d['Prompt'].strip()
-            gold_ans_list = d['Ans']
-            answer_cand = d['Candidate Ans']
+            gold_ans_list = [d['Ans']]
+            answer_cand = eval(d['Candidate Ans'])
             
             answer_pred_probs = predict_mask(model, answer_cand, prompt, mname)
             # {'Naples': 5.40697877407074, 'Rome': 5.137976503372192, ..., 'Mecca': 5.60733792998574}
@@ -185,11 +185,6 @@ def probe(
         print(f'Probing Accuracy {lang}: {accuracy / len(data)}')
         print('====')
         
-    # model_cache_dir = os.path.join(cache_dir, "models--" + hub_model_id.replace("/", "--"))
-    # print(model_cache_dir)
-    # if os.path.exists(model_cache_dir): shutil.rmtree(model_cache_dir)
-    # model_cache_dir_hub = os.path.join(cache_dir, "hub/models--" + hub_model_id.replace("/", "--"))
-    # if os.path.exists(model_cache_dir_hub): shutil.rmtree(model_cache_dir_hub)
     if os.path.exists(cache_dir): shutil.rmtree(cache_dir)
 
 if __name__ == "__main__":
