@@ -31,6 +31,5 @@ seeds=(
 for SEED in "${seeds[@]}"; do
 	for mname in "${models[@]}"; do
 		VLLM_CONFIGURE_LOGGING=0 python probe_baseline.py --seed $SEED --mname $mname --languages "${all_langs[@]}"
-		rm -rf $CACHE_DIR  # Clear cache after each run
 	done
 done
