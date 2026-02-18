@@ -1,10 +1,10 @@
-# (Building in progress) OPTIMIZING LANGUAGE MODELS FOR CROSSLINGUAL KNOWLEDGE CONSISTENCY
+# OPTIMIZING LANGUAGE MODELS FOR CROSSLINGUAL KNOWLEDGE CONSISTENCY
 
 <div align="center">
 
 Authors (_* Equal contribution_):  
-[Tianyu Liu*](https://rycolab.io/authors/tianyu/) • [Jirui Qi*](https://betswish.github.io/) • [Raquel Fernández](https://staff.fnwi.uva.nl/r.fernandezrovira/)  
-[Mrinmaya Sachan](https://rycolab.io/authors/mrinmaya/) • [Arianna Bisazza](https://www.cs.rug.nl/~bisazza/) • [Ryan Cotterell](https://rycolab.io/authors/ryan/)
+[Tianyu Liu*](https://rycolab.io/authors/tianyu/) • [Jirui Qi*](https://betswish.github.io/) • [Mrinmaya Sachan](https://rycolab.io/authors/mrinmaya/)
+[Ryan Cotterell](https://rycolab.io/authors/ryan/) • [Raquel Fernández](https://staff.fnwi.uva.nl/r.fernandezrovira/) • [Arianna Bisazza](https://www.cs.rug.nl/~bisazza/) 
 
 </div>
 
@@ -42,6 +42,4 @@ bash scripts/2_train_xcsqa.sh
 bash scripts/2_train_bmlama.sh
 ```
 
-
-## (3) Test and evaluation
 
