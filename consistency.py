@@ -85,9 +85,9 @@ def compute_consis_baseline(
             CLC = round(CLC*100, 2)
             CLC_list.append(CLC)
         except Exception as e:
-            CLC_list.append(-100.00) # Append -100 for languages that fail to compute consistency
+            CLC_list.append("Fail") # Append "Fail" for languages that fail to compute consistency
 
-    print(f"Baseline\t&\t" + '\t&\t'.join(map(str, CLC_list)) + r" \\")
+    print(f"{mname.split('/')[-1]} & {' & '.join(map(str, CLC_list))} \\\\")
     return CLC_list
 
 
@@ -99,14 +99,6 @@ def compute_consis(
     beta: float | None = None,
     metric: str = 'top1',
 ) -> float:
-    """Compute consistency between two languages."""
-    base_CLC_list = compute_consis_baseline(
-        seed=seed,
-        dataset=dataset,
-        instance_num=instance_num,
-        mname=mname,
-        metric=metric
-    )
     train_data = f"seed{seed}_sample{instance_num}_{dataset}"
 
     if dataset == 'bmlama':
@@ -118,6 +110,17 @@ def compute_consis(
     else:
         raise ValueError(f"Unknown dataset: {dataset}")
     
+    print(f"Langs & {' & '.join(langs)} \\\\")
+
+    """Compute consistency between two languages."""
+    base_CLC_list = compute_consis_baseline(
+        seed=seed,
+        dataset=dataset,
+        instance_num=instance_num,
+        mname=mname,
+        metric=metric
+    )
+
     CLC_list = []
     for lang in langs:
         post_mname = f"{mname.replace('/', '-')}_{'-'.join(['en', lang])}_1.0-1.0_{beta}"
@@ -141,9 +144,9 @@ def compute_consis(
             CLC = round(CLC*100, 2)
             CLC_list.append(CLC)
         except Exception as e:
-            CLC_list.append(-100.00) # Append -100 for languages that fail to compute consistency
+            CLC_list.append("Fail") # Append "Fail" for languages that fail to compute consistency
 
-    print(f"+ \methodname" + "\t&\t" + "\t&\t".join([f"{'+' if c > bc else ''}{c-bc:.2f}" if c != -100.00 else "Fail" for c, bc in zip(CLC_list, base_CLC_list)]) + r" \\")
+    print(f"+ DCO & {' & '.join([f'{'+' if c > bc else ''}{c-bc:.2f}' if c != 'Fail' else 'Fail' for c, bc in zip(CLC_list, base_CLC_list)])} \\\\")
     return CLC_list
 
 if __name__ == "__main__":
