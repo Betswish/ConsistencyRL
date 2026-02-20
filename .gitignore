@@ -1,3 +1,4 @@
 data/seed*
 checkpoints/*
 outputs/*
+logs/*
