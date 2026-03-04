@@ -2,3 +2,5 @@ data/seed*
 checkpoints/*
 outputs/*
 logs/*
+
+.env
