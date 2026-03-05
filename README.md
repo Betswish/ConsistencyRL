@@ -38,7 +38,7 @@ bash scripts/1_prepare_data_bmlama.sh
 
 ## (2) Train Your Models
 
-To train your model, firstly write your `hf_token` into `.env`. Once done, run the following script to train your model. It will automatically upload the post-trained model onto Huggingface and also save a copy locally in `checkpoints/`.
+To train your model, firstly ensure that your `hf_token` is stored in `.env` like `export HF_TOKEN="hf_xxxxxx"` (Override with your Hugging Face token). Once confirmed, run the following script to train your model. It will automatically upload the post-trained model onto Huggingface and also save a copy locally in `checkpoints/`.
 
 ```bash
 bash scripts/2_train_mmmlu.sh
