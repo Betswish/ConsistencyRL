@@ -48,19 +48,11 @@ def compute_consis_baseline(
     instance_num: int = 5000,
     mname: str | None = None,
     metric: str = 'rankc',
+    langs: list | None = None,
 ) -> float:
     """Compute consistency between two languages."""
 
     train_data = f"seed{seed}_sample{instance_num}_{dataset}_baseline"
-
-    if dataset == 'bmlama':
-        langs = ['fr', 'nl', 'es', 'ru', 'ja', 'zh', 'ko', 'vi', 'el', 'hu', 'he', 'tr', 'ca', 'ar', 'uk', 'fa']
-    elif dataset == 'mmmlu':
-        langs = ['ar', 'de', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'pt', 'sw', 'yo', 'zh', 'bn']
-    elif dataset == 'xcsqa':
-        langs = ['zh', 'de', 'es', 'fr', 'it', 'ja', 'nl', 'pl', 'pt', 'ru', 'ar', 'vi', 'hi', 'sw', 'ur']
-    else:
-        raise ValueError(f"Unknown dataset: {dataset}")
     
     CLC_list = []
     for lang in langs:
@@ -85,7 +77,7 @@ def compute_consis_baseline(
             CLC = round(CLC*100, 2)
             CLC_list.append(CLC)
         except Exception as e:
-            CLC_list.append("Fail") # Append "Fail" for languages that fail to compute consistency
+            CLC_list.append("-") # Append "-" for languages that fail to compute consistency
 
     print(f"{mname.split('/')[-1]} & {' & '.join(map(str, CLC_list))} \\\\")
     return CLC_list
@@ -98,19 +90,9 @@ def compute_consis(
     mname: str | None = None,
     beta: float | None = None,
     metric: str = 'top1',
+    langs: list | None = None,
 ) -> float:
     train_data = f"seed{seed}_sample{instance_num}_{dataset}"
-
-    if dataset == 'bmlama':
-        langs = ['fr', 'nl', 'es', 'ru', 'ja', 'zh', 'ko', 'vi', 'el', 'hu', 'he', 'tr', 'ca', 'ar', 'uk', 'fa']
-    elif dataset == 'mmmlu':
-        langs = ['ar', 'de', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'pt', 'sw', 'yo', 'zh', 'bn']
-    elif dataset == 'xcsqa':
-        langs = ['zh', 'de', 'es', 'fr', 'it', 'ja', 'nl', 'pl', 'pt', 'ru', 'ar', 'vi', 'hi', 'sw', 'ur']
-    else:
-        raise ValueError(f"Unknown dataset: {dataset}")
-    
-    print(f"Langs & {' & '.join(langs)} \\\\")
 
     """Compute consistency between two languages."""
     base_CLC_list = compute_consis_baseline(
@@ -118,7 +100,8 @@ def compute_consis(
         dataset=dataset,
         instance_num=instance_num,
         mname=mname,
-        metric=metric
+        metric=metric,
+        langs=langs,
     )
 
     CLC_list = []
@@ -144,9 +127,9 @@ def compute_consis(
             CLC = round(CLC*100, 2)
             CLC_list.append(CLC)
         except Exception as e:
-            CLC_list.append("Fail") # Append "Fail" for languages that fail to compute consistency
+            CLC_list.append("-") # Append "-" for languages that fail to compute consistency
 
-    print(f"+ DCO & {' & '.join([f'{'+' if c > bc else ''}{c-bc:.2f}' if c != 'Fail' else 'Fail' for c, bc in zip(CLC_list, base_CLC_list)])} \\\\")
+    print(f"+ DCO & {' & '.join([f'{'+' if c > bc else ''}{c-bc:.2f}' if c != '-' else '-' for c, bc in zip(CLC_list, base_CLC_list)])} \\\\")
     return CLC_list
 
 if __name__ == "__main__":
@@ -166,8 +149,20 @@ if __name__ == "__main__":
     metric = args.metric
     beta = args.beta
 
+
+    if dataset == 'bmlama':
+        langs = ['fr', 'nl', 'es', 'ru', 'ja', 'zh', 'ko', 'vi', 'el', 'hu', 'he', 'tr', 'ca', 'ar', 'uk', 'fa']
+    elif dataset == 'mmmlu':
+        langs = ['ar', 'de', 'es', 'fr', 'hi', 'id', 'it', 'ja', 'ko', 'pt', 'sw', 'yo', 'zh', 'bn']
+    elif dataset == 'xcsqa':
+        langs = ['zh', 'de', 'es', 'fr', 'it', 'ja', 'nl', 'pl', 'pt', 'ru', 'ar', 'vi', 'hi', 'sw', 'ur']
+    else:
+        raise ValueError(f"Unknown dataset: {dataset}")
+    
+    print(f"Langs & {' & '.join(langs)} \\\\")
+
     CLC = compute_consis(
-        seed=seed, dataset=dataset,
+        seed=seed, dataset=dataset, langs=langs,
         instance_num=instance_num, mname=mname,
         beta=beta,
         metric=metric

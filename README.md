@@ -23,6 +23,10 @@ pip install -e .
 cd ..
 ```
 
+### Set Huggingface Token
+
+Modify `.env` and add your Huggingface token.
+
 ## (1) Data Preparation
 
 For instance, to generate 5,000 instances for English and French languages, run the following command:
@@ -32,9 +36,9 @@ bash scripts/1_prepare_data_xcsqa.sh
 bash scripts/1_prepare_data_bmlama.sh
 ```
 
-## (2) Train your model
+## (2) Train Your Models
 
-To train your model, firstly write your `hf_token` into `.env`. Then, run the following script to train your model. It will automatically upload the trained model onto Huggingface and also save a copy locally in `checkpoints/`.
+To train your model, firstly write your `hf_token` into `.env`. Once done, run the following script to train your model. It will automatically upload the post-trained model onto Huggingface and also save a copy locally in `checkpoints/`.
 
 ```bash
 bash scripts/2_train_mmmlu.sh
@@ -42,4 +46,39 @@ bash scripts/2_train_xcsqa.sh
 bash scripts/2_train_bmlama.sh
 ```
 
+## (3) Evaluate Post-Trained Models with DCO
 
+For evaluation, run the following scripts to get the probing results of the untrained models:
+
+```bash
+bash scripts/3_eval_baseline_mmmlu.sh
+bash scripts/3_eval_baseline_xcsqa.sh
+bash scripts/3_eval_baseline_bmlama.sh
+```
+
+
+Run the following scripts to get the probing results of the post-trained models with DCO:
+
+```bash
+bash scripts/3_eval_mmmlu.sh
+bash scripts/3_eval_xcsqa.sh
+bash scripts/3_eval_bmlama.sh
+```
+
+## (4) Show Changes in Consistency & Accuracy
+
+All scripts are tested and should be ready to run by one-click:
+
+Scripts for computing consistency:
+```bash
+bash scripts/4_compute_clc_mmmlu.sh
+bash scripts/4_compute_clc_xcsqa.sh
+bash scripts/4_compute_clc_bmlama.sh
+```
+
+Scripts for computing accuracy:
+```bash
+bash scripts/4_compute_acc_mmmlu.sh
+bash scripts/4_compute_acc_xcsqa.sh
+bash scripts/4_compute_acc_bmlama.sh
+```
