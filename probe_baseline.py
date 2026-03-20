@@ -133,7 +133,9 @@ def probe_baseline(
             # [('Madrid', 4.722643804550171), ..., ('Como', 5.786579585075378)]
             ranked_candidates = [x[0] for x in sorted_probs]
             # ['Madrid', 'London', 'Rome', 'Chicago', 'Naples', 'Istanbul', 'Scotland', 'Armenia', 'Mecca', 'Como']
-
+            ranked_perplexities = [x[1] for x in sorted_probs]
+            # [4.722643804550171, ... , 5.786579585075378,]
+            
             # get the indices of all answers of gold_ans_list in raw_candidates
             gold_indices = [raw_candidates.index(ans) for ans in gold_ans_list]
             # get the indices of all candidates of ranked_candidates in raw_candidates
@@ -150,6 +152,9 @@ def probe_baseline(
         with open(f'{save_path}/{lang}_GoldIndices.json', 'w') as f:
             json.dump(all_gold_indices, f)
 
+        with open(f'{save_path}/{lang}_Perplexities.json', 'w') as f:
+            json.dump(ranked_perplexities, f)
+        
         with open(f'{save_path}/{lang}_RankedIndices.json', 'w') as f:
             json.dump(all_ranked_indices, f)
 
