@@ -118,7 +118,7 @@ def probe_baseline(
         # For saving probing results
         all_gold_indices = []
         all_ranked_indices = []
-
+        all_ranked_perplexities = []
         for i, d in enumerate(tqdm(data)):
             prompt = d['Prompt'].strip()
             gold_ans_list = [d['Ans']]
@@ -145,7 +145,7 @@ def probe_baseline(
 
             all_gold_indices.append(gold_indices)
             all_ranked_indices.append(ranked_indices)
-
+            all_ranked_perplexities.append(ranked_perplexities)
             accuracy += sum(1 for gold_ans in gold_ans_list if gold_ans in ranked_candidates[:len(gold_ans_list)]) / len(gold_ans_list)            
 
         # Saving probing results to files
@@ -153,7 +153,7 @@ def probe_baseline(
             json.dump(all_gold_indices, f)
 
         with open(f'{save_path}/{lang}_Perplexities.json', 'w') as f:
-            json.dump(ranked_perplexities, f)
+            json.dump(all_ranked_perplexities, f)
         
         with open(f'{save_path}/{lang}_RankedIndices.json', 'w') as f:
             json.dump(all_ranked_indices, f)
