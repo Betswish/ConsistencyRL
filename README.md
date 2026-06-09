@@ -8,6 +8,8 @@ Authors (_* Equal contribution_):
 
 </div>
 
+> [!NOTE] 
+> Our [paper](https://arxiv.org/abs/2603.04678v3) has been accepted by the [ICML 2026](https://icml.cc/)! 🎉
 
 ## (0) Environment Setup
 ### Install Dependencies from environment.yml
