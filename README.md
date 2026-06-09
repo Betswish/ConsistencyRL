@@ -4,6 +4,7 @@
 
 Authors (_* Equal contribution_):  
 [Tianyu Liu*](https://rycolab.io/authors/tianyu/) • [Jirui Qi*](https://betswish.github.io/) • [Mrinmaya Sachan](https://rycolab.io/authors/mrinmaya/)
+
 [Ryan Cotterell](https://rycolab.io/authors/ryan/) • [Raquel Fernández](https://staff.fnwi.uva.nl/r.fernandezrovira/) • [Arianna Bisazza](https://www.cs.rug.nl/~bisazza/) 
 
 </div>
