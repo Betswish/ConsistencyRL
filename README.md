@@ -1,4 +1,4 @@
-# OPTIMIZING LANGUAGE MODELS FOR CROSSLINGUAL KNOWLEDGE CONSISTENCY
+# Post-Training Language Models for Crosslingual Consistency
 
 <div align="center">
 
